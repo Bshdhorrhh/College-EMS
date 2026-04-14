@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="header-action" style="display: flex; justify-content: space-between; align-items: center;">
+    <h2>Advanced Analytics Reports</h2>
+    <a href="{{ url_for('admin.export_reports') }}" class="btn btn-primary">Export CSV</a>
+</div>
+<p style="color: #666; margin-bottom: 2rem;">Powered by <code>event_analytics</code> VIEW combining Events, Registrations, and Feedback tables.</p>
+
+<div class="card" style="overflow-x: auto;">
+    <table class="data-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: var(--bg-alt); text-align: left;">
+                <th>ID</th>
+                <th>Title & Category</th>
+                <th>Organizer</th>
+                <th>Capacity</th>
+                <th>Total Reg</th>
+                <th>Attended</th>
+                <th>Waitlisted</th>
+                <th>Avg Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in analytics %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td>{{ row['event_id'] }}</td>
+                <td><strong>{{ row['title'] }}</strong><br><small style="color: #888;">{{ row['category']|title }}</small></td>
+                <td>{{ row['organizer_name'] }}</td>
+                <td>{{ row['capacity'] }}</td>
+                <td>{{ row['total_registrations'] }}</td>
+                <td style="color: green;">{{ row['total_attended'] }}</td>
+                <td style="color: orange;">{{ row['total_waitlisted'] }}</td>
+                <td>{{ "%.1f"|format(row['average_rating']) if row['average_rating'] else 'N/A' }} / 5</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">No analytics data available.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .data-table th, .data-table td { padding: 12px; }
+</style>
+{% endblock %}

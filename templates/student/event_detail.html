@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="header-action">
+    <h2>{{ event.title }}</h2>
+    <a href="{{ url_for('student.events_list') }}" class="btn btn-secondary">Back to Events</a>
+</div>
+
+<div class="grid" style="margin-top: 2rem;">
+    <div class="card">
+        <h3>Event Details</h3>
+        <p><strong>Description:</strong> {{ event.description }}</p>
+        <p><strong>Date & Time:</strong> {{ event.event_date }} at {{ event.event_time }}</p>
+        <p><strong>Venue:</strong> {{ event.venue }}</p>
+        <p><strong>Category:</strong> <span class="badge">{{ event.category|capitalize }}</span></p>
+        <p><strong>Capacity:</strong> {{ event.capacity }} participants max</p>
+        <p><strong>Registration Deadline:</strong> {{ event.registration_deadline }}</p>
+        
+        <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Organizer Contact</h4>
+        <p><strong>Email:</strong> {% if event.contact_email %}<a href="mailto:{{ event.contact_email }}">{{ event.contact_email }}</a>{% else %}N/A{% endif %}</p>
+        <p><strong>Phone:</strong> {% if event.contact_phone %}{{ event.contact_phone }}{% else %}N/A{% endif %}</p>
+    </div>
+
+    <div class="card">
+        <h3>Registration</h3>
+        {% if existing_registration %}
+            <div class="alert alert-success" style="padding: 1rem; background: var(--bg-hover); border-radius: 8px; margin-bottom: 1rem;">
+                <p><strong>You are already registered!</strong></p>
+                <p>Status: <span class="badge" style="background: var(--primary);">{{ existing_registration.attendance_status|capitalize }}</span></p>
+                <p>Registered at: {{ existing_registration.registered_at }}</p>
+                
+                <div style="margin-top: 1rem;">
+                    <form action="{{ url_for('student.cancel_registration', event_id=event.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel your registration?');">
+                        <button type="submit" class="btn btn-secondary" style="background-color: #dc3545; color: white;">Cancel Registration</button>
+                    </form>
+                </div>
+            </div>
+
+            {% if event.status == 'completed' and existing_registration.attendance_status == 'attended' %}
+                <div class="card" style="margin-top: 1rem; border-top: 2px solid var(--border-color);">
+                    {% if feedback_submitted %}
+                        <p style="color: green;"><strong>✅ You have already submitted feedback for this event. Thank you!</strong></p>
+                    {% else %}
+                        <h4>Submit Feedback</h4>
+                        <form method="POST" action="{{ url_for('student.submit_feedback', event_id=event.id) }}">
+                            <label>Rating (1-5)</label>
+                            <input type="number" name="rating" min="1" max="5" required style="margin-bottom: 1rem;">
+                            
+                            <label>Comments (Optional)</label>
+                            <textarea name="comment" rows="3" placeholder="Tell us what you thought!"></textarea>
+                            
+                            <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Submit Feedback</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        {% elif event.status != 'upcoming' %}
+            <div class="alert alert-warning" style="padding: 1rem; background: #fff3cd; color: #856404; border-radius: 8px;">
+                Registration is closed for this event.
+            </div>
+        {% else %}
+            <form method="POST" action="{{ url_for('student.register', event_id=event.id) }}">
+                <p style="margin-bottom: 1rem; color: #666;">You will be registered as <strong>{{ current_user.name }}</strong> ({{ current_user.email }}).</p>
+                <div style="margin-bottom: 1rem; padding: 0.75rem; background: var(--bg-alt); border-radius: 6px;">
+                    <strong>Team Sizing Rules:</strong> Min {{ event.min_team_size }} - Max {{ event.max_team_size }}
+                </div>
+                
+                {% set max_configurable = event.max_team_size|default(1) %}
+                
+                {% if max_configurable > 1 %}
+                    <label>Team Name (Required for teams)</label>
+                    <input type="text" name="team_name" placeholder="e.g. Code Ninjas" required>
+                    
+                    <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Team Members (Max Allowed: {{ max_configurable - 1 }})</h4>
+                    <div id="team-members-container">
+                        {% set min_extra = (event.min_team_size - 1) if (event.min_team_size - 1) > 0 else 0 %}
+                        {% for i in range(min_extra) %}
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <input type="text" name="team_members[]" placeholder="Member Name" required style="flex:1;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <button type="button" id="add-member-btn" class="btn btn-secondary" style="margin-bottom: 1rem; font-size: 0.9rem;">+ Add Another Member</button>
+                    
+                    <script>
+                        const maxMembers = {{ max_configurable - 1 }};
+                        const container = document.getElementById('team-members-container');
+                        const addBtn = document.getElementById('add-member-btn');
+                        
+                        function updateBtn() {
+                            if(container.children.length >= maxMembers) {
+                                addBtn.style.display = 'none';
+                            } else {
+                                addBtn.style.display = 'block';
+                            }
+                        }
+                        
+                        addBtn.addEventListener('click', () => {
+                            if(container.children.length < maxMembers) {
+                                const div = document.createElement('div');
+                                div.style.display = 'flex';
+                                div.style.gap = '0.5rem';
+                                div.style.marginBottom = '0.5rem';
+                                
+                                const input = document.createElement('input');
+                                input.type = 'text';
+                                input.name = 'team_members[]';
+                                input.placeholder = 'Member Name';
+                                input.style.flex = '1';
+                                input.required = true;
+                                
+                                const removeBtn = document.createElement('button');
+                                removeBtn.type = 'button';
+                                removeBtn.textContent = 'X';
+                                removeBtn.style.padding = '0.5rem';
+                                removeBtn.style.background = '#f44336';
+                                removeBtn.style.color = '#fff';
+                                removeBtn.style.border = 'none';
+                                removeBtn.style.borderRadius = '4px';
+                                removeBtn.style.cursor = 'pointer';
+                                
+                                removeBtn.onclick = () => { div.remove(); updateBtn(); };
+                                
+                                div.appendChild(input);
+                                div.appendChild(removeBtn);
+                                container.appendChild(div);
+                                updateBtn();
+                            }
+                        });
+                        
+                        updateBtn();
+                    </script>
+                {% else %}
+                    <p style="margin-bottom: 1rem; color: #4caf50;"><strong>This is a solo event. No team required.</strong></p>
+                {% endif %}
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Confirm Registration</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

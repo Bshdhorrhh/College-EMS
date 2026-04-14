@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+<div class="grid">
+    <div class="card">
+        <h3>Total Users</h3>
+        <p style="font-size: 2rem; font-weight: bold; color: var(--primary);">{{ total_users }}</p>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">Manage Users</a>
+    </div>
+    <div class="card">
+        <h3>Total Events</h3>
+        <p style="font-size: 2rem; font-weight: bold; color: var(--primary);">{{ events_count }}</p>
+    </div>
+</div>
+<div class="grid" style="margin-top: 2rem;">
+    <div class="card">
+        <h3>Events by Category</h3>
+        <canvas id="categoryChart"></canvas>
+    </div>
+    <div class="card">
+        <h3>Registration Status</h3>
+        <canvas id="statusChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    fetch('/admin/api_stats')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('categoryChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(data.categories),
+                    datasets: [{
+                        data: Object.values(data.categories),
+                        backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#f44336', '#9c27b0']
+                    }]
+                }
+            });
+            new Chart(document.getElementById('statusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(data.attendance),
+                    datasets: [{
+                        data: Object.values(data.attendance),
+                        backgroundColor: ['#03a9f4', '#e91e63', '#ffc107', '#8bc34a']
+                    }]
+                }
+            });
+        });
+</script>
+{% endblock %}

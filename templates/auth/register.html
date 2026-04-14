@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 2rem auto;">
+    <h2>Create Account</h2>
+    <form method="POST">
+        <label>Full Name</label>
+        <input type="text" name="name" required>
+        <label>Email</label>
+        <input type="email" name="email" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
+        <label>Role</label>
+        <select name="role" required>
+            <option value="student">Student</option>
+            <option value="organizer">Organizer</option>
+        </select>
+        <label>Department (Optional)</label>
+        <input type="text" name="department">
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+    </form>
+</div>
+{% endblock %}

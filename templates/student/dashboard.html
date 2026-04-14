@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="header-action">
+    <h2>My Dashboard</h2>
+    <a href="{{ url_for('student.events_list') }}" class="btn btn-primary">Browse All Events</a>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h3>My Registrations</h3>
+    {% if registrations %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Event Title</th>
+                <th>Date & Time</th>
+                <th>Venue</th>
+                <th>Status</th>
+                <th>Registered At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reg in registrations %}
+            <tr>
+                <td><a href="{{ url_for('student.event_detail', event_id=reg.event_id) }}" style="font-weight: bold; text-decoration: underline;">{{ reg.event_title }}</a></td>
+                <td>{{ reg.event_date }} {{ reg.event_time }}</td>
+                <td>{{ reg.venue }}</td>
+                <td>
+                    {% if reg.attendance_status == 'waitlisted' %}
+                        <span class="badge" style="background: var(--warning);">Waitlisted</span>
+                    {% elif reg.attendance_status == 'registered' %}
+                        <span class="badge" style="background: var(--primary);">Registered</span>
+                    {% elif reg.attendance_status == 'attended' %}
+                        <span class="badge" style="background: var(--success);">Attended</span>
+                    {% else %}
+                        <span class="badge">{{ reg.attendance_status|capitalize }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ reg.registered_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>You haven't registered for any events yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

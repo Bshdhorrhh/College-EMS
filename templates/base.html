@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College EMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="/">College EMS</a></div>
+        <ul class="nav-links">
+            {% if current_user.is_authenticated %}
+                <li><a href="/">Dashboard</a></li>
+                {% if current_user.role == 'organizer' %}
+                    <li><a href="{{ url_for('organizer.new_event') }}">Create Event</a></li>
+                    <li><a href="{{ url_for('organizer.reports') }}">Reports</a></li>
+                {% elif current_user.role == 'admin' %}
+                    <li><a href="{{ url_for('admin.users') }}">Users</a></li>
+                    <li><a href="{{ url_for('admin.reports') }}">Reports</a></li>
+                    <li><a href="{{ url_for('admin.audit_logs') }}">Audit Logs</a></li>
+                {% elif current_user.role == 'student' %}
+                    <li><a href="{{ url_for('student.events_list') }}">Browse Events</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('auth.logout') }}">Logout ({{ current_user.name }})</a></li>
+            {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="container msg-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div class="container main-content">
+        {% block content %}{% endblock %}
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

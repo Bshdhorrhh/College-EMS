@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2>Create New Event</h2>
+    <form method="POST">
+        <label>Event Title</label>
+        <input type="text" name="title" required>
+        <label>Description</label>
+        <textarea name="description" rows="4"></textarea>
+        <label>Category</label>
+        <select name="category" required>
+            <option value="technical">Technical</option>
+            <option value="cultural">Cultural</option>
+            <option value="sports">Sports</option>
+            <option value="workshop">Workshop</option>
+            <option value="seminar">Seminar</option>
+        </select>
+        <label>Venue</label>
+        <input type="text" name="venue" required>
+        <label>Event Date</label>
+        <input type="date" name="event_date" required>
+        <label>Event Time</label>
+        <input type="time" name="event_time" required>
+        <label>Registration Deadline</label>
+        <input type="datetime-local" name="registration_deadline" required>
+        <label>Capacity</label>
+        <input type="number" name="capacity" min="1" required>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Contact Details</h3>
+        <label>Contact Email</label>
+        <input type="email" name="contact_email" placeholder="organiser@college.edu">
+        <label>Contact Phone</label>
+        <input type="text" name="contact_phone" placeholder="+1 234 567 8900">
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Team Settings</h3>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 1rem;">Set Max Team Size to 1 if this is a solo event.</p>
+        <div style="display: flex; gap: 1rem;">
+            <div style="flex: 1;">
+                <label>Min Team Size</label>
+                <input type="number" name="min_team_size" min="1" value="1" required>
+            </div>
+            <div style="flex: 1;">
+                <label>Max Team Size</label>
+                <input type="number" name="max_team_size" min="1" value="1" required>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width:100%;">Create Event</button>
+    </form>
+</div>
+{% endblock %}

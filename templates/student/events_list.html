@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Upcoming Events</h2>
+
+<div class="grid" style="margin-top: 2rem;">
+    {% for event in events %}
+    <div class="card event-card">
+        {% if event.banner_url %}
+        <img src="{{ event.banner_url }}" alt="{{ event.title }}" style="width:100%; height:150px; object-fit:cover; border-radius:8px; margin-bottom:1rem;">
+        {% endif %}
+        <h3>{{ event.title }}</h3>
+        <p><strong>Date:</strong> {{ event.event_date }} at {{ event.event_time }}</p>
+        <p><strong>Category:</strong> <span class="badge">{{ event.category|capitalize }}</span></p>
+        <p><strong>Venue:</strong> {{ event.venue }}</p>
+        <div style="margin-top: 1rem;">
+            <a href="{{ url_for('student.event_detail', event_id=event.id) }}" class="btn btn-primary" style="display:block; text-align:center;">View Details & Register</a>
+        </div>
+    </div>
+    {% else %}
+    <p>No upcoming events available at the moment.</p>
+    {% endfor %}
+</div>
+{% endblock %}

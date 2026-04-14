@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Organizer Dashboard</h2>
+<a href="{{ url_for('organizer.new_event') }}" class="btn btn-primary" style="margin-bottom: 2rem;">+ Create New Event</a>
+<div class="grid">
+    {% for event in events %}
+    <div class="card">
+        <h3>{{ event.title }} <span class="badge">{{ event.status }}</span></h3>
+        <p><strong>Date:</strong> {{ event.event_date }}</p>
+        <p><strong>Registrations:</strong> {{ event.capacity }} Capacity</p>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+            <a href="{{ url_for('organizer.event_detail', event_id=event.id) }}" class="btn btn-secondary">View Details</a>
+            <a href="{{ url_for('organizer.attendance', event_id=event.id) }}" class="btn btn-secondary">Attendance</a>
+        </div>
+    </div>
+    {% else %}
+    <p>You haven't created any events yet.</p>
+    {% endfor %}
+</div>
+<div class="card" style="margin-top: 2rem;">
+    <h3>Registration Status Overview</h3>
+    <div style="max-width: 400px; margin: 0 auto;">
+        <canvas id="organizerChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    fetch('/organizer/api_stats')
+        .then(response => response.json())
+        .then(data => {
+            if (Object.keys(data.attendance).length > 0) {
+                new Chart(document.getElementById('organizerChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(data.attendance),
+                        datasets: [{
+                            data: Object.values(data.attendance),
+                            backgroundColor: ['#03a9f4', '#e91e63', '#ffc107', '#8bc34a']
+                        }]
+                    }
+                });
+            } else {
+                document.getElementById('organizerChart').parentElement.innerHTML = '<p>No registration data yet.</p>';
+            }
+        });
+</script>
+{% endblock %}

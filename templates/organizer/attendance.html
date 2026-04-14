@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Mark Attendance: {{ event.title }}</h2>
+<p>Date: {{ event.event_date }}</p>
+
+
+<h3>Mark Attendance Manually</h3>
+<form method="POST">
+    <table>
+        <thead><tr><th>Participant Name</th><th>Email</th><th>Team</th><th>Status</th><th>Mark Output</th></tr></thead>
+        <tbody>
+            {% for r in registrations %}
+            <tr>
+                <td>{{ r.participant_name }}</td>
+                <td>{{ r.participant_email }}</td>
+                <td>{{ r.team_name or '-' }}</td>
+                <td>{{ r.attendance_status }}</td>
+                <td>
+                    <select name="attendance_{{ r.id }}">
+                        <option value="registered" {% if r.attendance_status == 'registered' %}selected{% endif %}>Registered</option>
+                        <option value="attended" {% if r.attendance_status == 'attended' %}selected{% endif %}>Attended</option>
+                        <option value="absent" {% if r.attendance_status == 'absent' %}selected{% endif %}>Absent</option>
+                    </select>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No registrations found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        {% if registrations %}
+        <br>
+        <button type="submit" class="btn btn-primary">Save Attendance</button>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

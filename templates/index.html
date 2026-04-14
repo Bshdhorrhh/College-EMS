@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="hero">
+    <h1>Welcome to College Event Management System</h1>
+    <p>Efficiently organize and manage your campus events from a single dashboard.</p>
+    <div class="hero-actions">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login to Portal</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-secondary">Create Account</a>
+    </div>
+</div>
+{% endblock %}
