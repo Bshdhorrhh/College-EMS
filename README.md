@@ -109,6 +109,5 @@ The application handles three primary stakeholders with interconnected lifecycle
 
 ## Default Credentials
 All passwords are set to `password123`.
-- Admin: `admin@college.edu`
 - Organizer: `alice@college.edu`
 - Student: `s1@college.edu` (Requires manual registration via UI if not present)
